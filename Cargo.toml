@@ -20,7 +20,7 @@ take_mut = "0.2.2"
 num-bigint = "0.4.0"
 [dev-dependencies]
 num = "0.4.0"
-polynomial-ring = "0.2.1"
+polynomial-ring = "0.4.0"
 [features]
 default = []
 __internal_inject_debug = [] # DO NOT USE
