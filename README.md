@@ -7,4 +7,4 @@ Algorithms on ring.
 * solve $`ax\equiv b \pmod{m}`$ (division)
 * CRT (Chinese Remainder Theorem)
 # Licence
-MIT OR Apache-2.0
+AGPL-3.0-or-later
