@@ -102,6 +102,17 @@ macro_rules! ring_normalize {
         }
     };
 }
+macro_rules! ring_normalize_unsigned {
+    ($t:ty) => {
+        impl RingNormalize for $t {
+            fn leading_unit(&self) -> Self {
+                use num_traits::One;
+                Self::one()
+            }
+            fn normalize_mut(&mut self) {}
+        }
+    };
+}
 
 ring_normalize!(i8);
 ring_normalize!(i16);
@@ -109,6 +120,12 @@ ring_normalize!(i32);
 ring_normalize!(i64);
 ring_normalize!(i128);
 ring_normalize!(isize);
+ring_normalize_unsigned!(u8);
+ring_normalize_unsigned!(u16);
+ring_normalize_unsigned!(u32);
+ring_normalize_unsigned!(u64);
+ring_normalize_unsigned!(u128);
+ring_normalize_unsigned!(usize);
 
 impl RingNormalize for num_bigint::BigInt {
     fn leading_unit(&self) -> Self {
