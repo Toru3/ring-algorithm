@@ -176,6 +176,30 @@ fn test_mod_inv2() {
     let b = power::<R>(poly![2, 1], 6);
     assert_eq!(check_mod_inv::<R>(a, b), sz);
 }
+
+fn check_mod_div<T>(a: T, b: T, m: T) -> Option<T>
+where
+    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize,
+    for<'x> &'x T: EuclideanRingOperation<T>,
+{
+    modulo_division::<T>(a.clone(), b.clone(), m.clone()).map(|x| &(&(b * x) - &a) % &m)
+}
+#[test]
+fn test_mod_div() {
+    // not exists inverse
+    assert_eq!(check_mod_div::<i32>(0, 0, 0), None);
+    assert_eq!(check_mod_div::<i32>(0, 42, 0), None);
+    assert_eq!(check_mod_div::<i32>(0, 0, 42), None);
+    assert_eq!(check_mod_div::<i32>(6, 4, 8), None);
+    assert_eq!(check_mod_div::<i32>(1, 3, 6), None);
+    // exists inverse
+    assert_eq!(check_mod_div::<i32>(1, 97, 89), Some(0));
+    assert_eq!(check_mod_div::<i32>(1, 7, 15), Some(0));
+    assert_eq!(check_mod_div::<i32>(1, 42, 55), Some(0));
+    assert_eq!(check_mod_div::<i32>(1, 15, 64), Some(0));
+    assert_eq!(check_mod_div::<i32>(6, 2, 8), Some(0));
+    assert_eq!(check_mod_div::<i32>(6, 9, 12), Some(0));
+}
 fn check_crt<T>(u: &[T], m: &[T])
 where
     T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize,
