@@ -62,8 +62,10 @@ impl<'a, T> EuclideanRingOperation<T> for &'a T where
 `a/lc(a)` in $`R[x]`$ (`lc(x)` is leading coefficent of x).
 */
 pub trait RingNormalize {
+    #[must_use]
     fn leading_unit(&self) -> Self;
     fn normalize_mut(&mut self);
+    #[must_use]
     fn into_normalize(mut self) -> Self
     where
         Self: Sized,
@@ -71,6 +73,7 @@ pub trait RingNormalize {
         self.normalize_mut();
         self
     }
+    #[must_use]
     fn normalize(&self) -> Self
     where
         Self: Clone,
