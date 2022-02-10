@@ -178,6 +178,9 @@ where
     T: sealed::Sized + Eq + num_traits::Zero + num_traits::One + RingNormalize,
     for<'x> &'x T: EuclideanRingOperation<T>,
 {
+    if m.is_zero() || a.is_zero() {
+        return None;
+    }
     let (gcd, inv_a, _) = normalized_extended_euclidian_algorithm::<T>(a, m);
     if gcd.is_one() {
         Some(inv_a)
@@ -203,6 +206,9 @@ where
     T: sealed::Sized + Clone + Eq + num_traits::Zero + num_traits::One + RingNormalize,
     for<'x> &'x T: EuclideanRingOperation<T>,
 {
+    if m.is_zero() || b.is_zero() {
+        return None;
+    }
     let (gcd, inv_b, _) = normalized_extended_euclidian_algorithm::<T>(b, m.clone());
     if (&a % &gcd).is_zero() {
         Some(&(&a / &gcd * inv_b) % &m)
@@ -231,18 +237,20 @@ where
     if u.len() != m.len() {
         return None;
     }
-    let mut v = Vec::with_capacity(u.len());
-    for (i, (u_i, m_i)) in u.iter().zip(m.iter()).enumerate() {
-        let coef_i = modulo_inverse::<T>(
-            m[0..i].iter().fold(T::one(), |p, v| &(&p * v) % m_i),
-            m_i.clone(),
-        )?;
-        let t = v
+    let len = u.len();
+    let mut v = Vec::with_capacity(len);
+    v.push(u[0].clone());
+    for (i, (u_i, m_i)) in u.iter().zip(m.iter()).enumerate().skip(1) {
+        let p = (v[i - 1].clone(), m[i - 1].clone());
+        let (t, n) = m
             .iter()
-            .zip(m.iter())
+            .zip(v.iter())
             .rev()
-            .fold(T::zero(), |t, (v_j, m_j)| &(&(m_j * &t) + v_j) % m_i);
-        v.push(&(&(u_i - &t) * &coef_i) % m_i);
+            .skip(1)
+            .fold(p, |(t, n), (m_j, v_j)| {
+                (&(v_j + &(m_j * &t)) % m_i, &(&n * m_j) % m_i)
+            });
+        v.push(modulo_division::<T>(u_i + &(m_i - &t), n, m_i.clone())?);
     }
     let mut ret = v.pop().unwrap();
     for (v_i, m_i) in v.iter().zip(m.iter()).rev() {
