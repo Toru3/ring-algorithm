@@ -1,7 +1,9 @@
 use crate::sealed;
 use crate::*;
+use is_prime_for_primitive_int::IsPrime;
 use num_traits::{One, Zero};
 use polynomial_ring::Polynomial;
+
 impl<K> RingNormalize for Polynomial<K>
 where
     K: Clone + Zero + One + for<'x> std::ops::AddAssign<&'x K> + for<'x> std::ops::DivAssign<&'x K>,
@@ -245,4 +247,81 @@ fn test_crt() {
         poly![1, 8, 1],
     ];
     check_crt::<R>(&u, &m);
+}
+#[cfg(feature = "num-bigint")]
+fn check_fcrt<T>(u: &[T], m: &[T])
+where
+    T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize,
+    for<'x> &'x T: EuclideanRingOperation<T>,
+{
+    let a = fast_chinese_remainder_theorem::<T>(u, m);
+    for (u, m) in u.iter().zip(m.iter()) {
+        assert!((&(&a - u) % m).is_zero());
+    }
+}
+#[cfg(feature = "num-bigint")]
+#[test]
+fn test_fcrt() {
+    type R = Polynomial<num::Rational64>;
+    let u = vec![2, 3, 2, 6];
+    let m = vec![3, 5, 7, 11];
+    check_fcrt::<i32>(&u, &m);
+    let u = vec![3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]
+        .into_iter()
+        .map(|u| num::BigInt::from(u))
+        .collect::<Vec<_>>();
+    let m = vec![2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+        .into_iter()
+        .map(|m| num::BigInt::from(m))
+        .collect::<Vec<_>>();
+    check_fcrt::<num::BigInt>(&u, &m);
+    let u = vec![
+        poly![3, 1],
+        poly![5],
+        poly![7, 1],
+        poly![1, 1],
+        poly![2],
+        poly![1, 1],
+        poly![3, 3],
+        poly![1, 7],
+    ];
+    let m = vec![
+        poly![1, 1, 1],
+        poly![1, 2, 1],
+        poly![1, 3, 1],
+        poly![1, 4, 1],
+        poly![1, 5, 1],
+        poly![1, 6, 1],
+        poly![1, 7, 1],
+        poly![1, 8, 1],
+    ];
+    check_crt::<R>(&u, &m);
+}
+#[cfg(feature = "num-bigint")]
+fn make_prime_list(n: usize) -> Vec<u64> {
+    let mut v = Vec::with_capacity(n);
+    for p in 2.. {
+        if p.is_prime() {
+            v.push(p);
+            if v.len() >= n {
+                return v;
+            }
+        }
+    }
+    unreachable!()
+}
+
+#[cfg(feature = "num-bigint")]
+#[test]
+fn test_fcrt2() {
+    type Z = num::BigInt;
+    let m = make_prime_list(8192)
+        .into_iter()
+        .map(|p| Z::from(p))
+        .collect::<Vec<_>>();
+    let u = m
+        .iter()
+        .map(|m| Z::from(rand::random::<u128>()) % m)
+        .collect::<Vec<_>>();
+    check_fcrt::<Z>(&u, &m);
 }

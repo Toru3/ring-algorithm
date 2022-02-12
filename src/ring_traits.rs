@@ -130,6 +130,7 @@ ring_normalize_unsigned!(u64);
 ring_normalize_unsigned!(u128);
 ring_normalize_unsigned!(usize);
 
+#[cfg(feature = "num-bigint")]
 impl RingNormalize for num_bigint::BigInt {
     fn leading_unit(&self) -> Self {
         use num_traits::One;
@@ -143,5 +144,27 @@ impl RingNormalize for num_bigint::BigInt {
         if self.sign() == num_bigint::Sign::Minus {
             *self = -&*self
         }
+    }
+}
+#[cfg(feature = "num-bigint")]
+impl RingNormalize for num_bigint::BigUint {
+    fn leading_unit(&self) -> Self {
+        use num_traits::One;
+        Self::one()
+    }
+    fn normalize_mut(&mut self) {}
+}
+#[cfg(feature = "rug")]
+impl RingNormalize for rug::Integer {
+    fn leading_unit(&self) -> Self {
+        use num_traits::{One, Zero};
+        if self < &Self::zero() {
+            -Self::one()
+        } else {
+            Self::one()
+        }
+    }
+    fn normalize_mut(&mut self) {
+        self.abs_mut()
     }
 }
