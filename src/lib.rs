@@ -443,7 +443,6 @@ for (u, m) in u.iter().zip(m.iter()) {
 }
 ```
 */
-#[inline(never)]
 pub fn fast_chinese_remainder_theorem<T>(u: &[T], m: &[T]) -> T
 where
     T: sealed::Sized + Clone + Eq + num_traits::Zero + num_traits::One + ring_traits::RingNormalize,
