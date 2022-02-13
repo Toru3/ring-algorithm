@@ -10,7 +10,6 @@ image: "rust:latest"
     - ls -l ${CARGO_HOME}/bin/
     - ls -l ${CARGO_HOME}/registry/index/
     - ls -l ${CARGO_HOME}/registry/cache/
-    - ls -l ${CARGO_HOME}/git/db/
   cache:
     - key:
         files: 
