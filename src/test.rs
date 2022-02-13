@@ -59,17 +59,17 @@ fn test_gcd() {
 fn test_gcd2() {
     type R = Polynomial<num::Rational64>;
     let z = R::zero();
-    assert_eq!(gcd::<R>(z.clone(), z.clone()), z.clone());
+    assert_eq!(gcd::<R>(z.clone(), z.clone()), z);
     let a = expand_poly![[2], [1, 1], [2, 1], [3, 1]];
     let b = expand_poly![[3], [1, 1], [4, 1]];
     let c = poly![1, 1];
     let d = expand_poly![[4, 1], [5, 1]];
-    assert_eq!(gcd::<R>(a.clone(), z.clone()), a.clone());
-    assert_eq!(gcd::<R>(z.clone(), a.clone()), a.clone());
-    let mut m = gcd::<R>(a.clone(), b.clone());
+    assert_eq!(gcd::<R>(a.clone(), z.clone()), a);
+    assert_eq!(gcd::<R>(z, a.clone()), a);
+    let mut m = gcd::<R>(a.clone(), b);
     m.monic();
-    assert_eq!(m, c.clone());
-    let mut m = gcd::<R>(a.clone(), d.clone());
+    assert_eq!(m, c);
+    let mut m = gcd::<R>(a, d);
     m.monic();
     assert!(m.is_one());
 }
@@ -99,9 +99,9 @@ fn test_eea2() {
     let b = expand_poly![[3], [1, 1], [4, 1]];
     let d = expand_poly![[4, 1], [5, 1]];
     assert!(check_eea::<R>(a.clone(), z.clone()));
-    assert!(check_eea::<R>(z.clone(), a.clone()));
-    assert!(check_eea::<R>(a.clone(), b.clone()));
-    assert!(check_eea::<R>(a.clone(), d.clone()));
+    assert!(check_eea::<R>(z, a.clone()));
+    assert!(check_eea::<R>(a.clone(), b));
+    assert!(check_eea::<R>(a, d));
 }
 fn check_neea<T>(a: T, b: T) -> bool
 where
@@ -129,9 +129,9 @@ fn test_neea2() {
     let b = expand_poly![[3], [1, 1], [4, 1]];
     let d = expand_poly![[4, 1], [5, 1]];
     assert!(check_neea::<R>(a.clone(), z.clone()));
-    assert!(check_neea::<R>(z.clone(), a.clone()));
-    assert!(check_neea::<R>(a.clone(), b.clone()));
-    assert!(check_neea::<R>(a.clone(), d.clone()));
+    assert!(check_neea::<R>(z, a.clone()));
+    assert!(check_neea::<R>(a.clone(), b));
+    assert!(check_neea::<R>(a, d));
 }
 fn check_mod_inv<T>(a: T, m: T) -> Option<T>
 where
@@ -163,11 +163,11 @@ fn test_mod_inv2() {
     let d = expand_poly![[4, 1], [5, 1]];
     assert_eq!(check_mod_inv::<R>(z.clone(), z.clone()), None);
     assert_eq!(check_mod_inv::<R>(a.clone(), z.clone()), None);
-    assert_eq!(check_mod_inv::<R>(z.clone(), a.clone()), None);
-    assert_eq!(check_mod_inv::<R>(b.clone(), d.clone()), None);
+    assert_eq!(check_mod_inv::<R>(z, a.clone()), None);
+    assert_eq!(check_mod_inv::<R>(b, d.clone()), None);
     // exists inverse
     let sz = Some(R::zero());
-    assert_eq!(check_mod_inv::<R>(a.clone(), d.clone()), sz);
+    assert_eq!(check_mod_inv::<R>(a, d), sz);
     let a = poly![7, 1];
     let b = expand_poly![[3, 1], [5, 1]];
     assert_eq!(check_mod_inv::<R>(a, b), sz);
@@ -268,11 +268,11 @@ fn test_fcrt() {
     check_fcrt::<i32>(&u, &m);
     let u = vec![3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]
         .into_iter()
-        .map(|u| num::BigInt::from(u))
+        .map(num::BigInt::from)
         .collect::<Vec<_>>();
     let m = vec![2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
         .into_iter()
-        .map(|m| num::BigInt::from(m))
+        .map(num::BigInt::from)
         .collect::<Vec<_>>();
     check_fcrt::<num::BigInt>(&u, &m);
     let u = vec![
@@ -317,7 +317,7 @@ fn test_fcrt2() {
     type Z = num::BigInt;
     let m = make_prime_list(8192)
         .into_iter()
-        .map(|p| Z::from(p))
+        .map(Z::from)
         .collect::<Vec<_>>();
     let u = m
         .iter()
