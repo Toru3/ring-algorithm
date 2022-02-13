@@ -2,19 +2,22 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
-    - which cargo
-    - echo ${CARGO_HOME}
-    - ls  ${CARGO_HOME}
     - rustup --version && rustup component add rustfmt
     - rustc --version && cargo --version
     - cargo fmt --all -- --check
     - cargo test --all --verbose
   cache:
-    key:
-      files: 
-        - Cargo.lock
-    paths:
-      - target/
+    - key:
+        files: 
+          - Cargo.lock
+      paths:
+        - target/
+    - key: one-key-to-rule-them-all
+      paths:
+        - ${CARGO_HOME}/bin/
+        - ${CARGO_HOME}/registry/index/
+        - ${CARGO_HOME}/registry/cache/
+        - ${CARGO_HOME}/git/db/
 
 # Use cargo to test the project
 test:stable:
