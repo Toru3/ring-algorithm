@@ -15,6 +15,11 @@ image: "rust:latest"
         - Cargo.lock
     paths:
       - target/
+    key: one-key-to-rule-them-all
+    paths:
+      - ${HOME}/.cargo/git/db/
+      - ${HOME}/.cargo/registry/index/
+      - ${HOME}/.cargo/registry/cache/
 
 # Use cargo to test the project
 test:stable:
