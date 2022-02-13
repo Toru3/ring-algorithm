@@ -10,6 +10,9 @@ image: "rust:latest"
     - cargo fmt --all -- --check
     - cargo test --all --verbose
   cache:
+    key:
+      files: 
+        - Cargo.lock
     paths:
       - target/
 
