@@ -4,7 +4,7 @@ image: "rust:latest"
   script:
     - rustup component add rustfmt clippy
     - rustup --version && rustc --version && cargo --version
-    - cargo fmt --all -- --check
+    - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
   cache:
