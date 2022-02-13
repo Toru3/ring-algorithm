@@ -2,16 +2,15 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
+    - rustup update
     - rustup component add rustfmt clippy
     - rustup --version && rustc --version && cargo --version
     - export CARGO_HOME=$(pwd)
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
-    - echo ${CARGO_HOME}/bin/
     - echo ${CARGO_HOME}/registry/index/
     - echo ${CARGO_HOME}/registry/cache/
-    - ls -l ${CARGO_HOME}/bin/
     - ls -l ${CARGO_HOME}/registry/index/
     - ls -l ${CARGO_HOME}/registry/cache/
   cache:
