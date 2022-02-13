@@ -10,7 +10,7 @@ image: "rust:latest"
     - cargo test --workspace --all-targets --all-features --verbose
   cache:
     key:
-      files: 
+      files:
         - Cargo.lock
     paths:
       - target/
