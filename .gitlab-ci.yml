@@ -5,21 +5,15 @@ image: "rust:latest"
     - rustup update
     - rustup component add rustfmt clippy
     - rustup --version && rustc --version && cargo --version
-    - mkdir .cargo && export CARGO_HOME=$(pwd)/.cargo
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
   cache:
-    - key:
-        files: 
-          - Cargo.lock
-      paths:
-        - target/
-    - key: one-key-to-rule-them-all
-      paths:
-        - .cargo/registry/index/
-        - .cargo/registry/cache/
-        - .cargo/git/db/
+    key:
+      files: 
+        - Cargo.lock
+    paths:
+      - target/
 
 # Use cargo to test the project
 test:stable:
