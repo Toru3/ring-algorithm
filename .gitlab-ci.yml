@@ -7,6 +7,10 @@ image: "rust:latest"
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
+    - ls -l ${CARGO_HOME}/bin/
+    - ls -l ${CARGO_HOME}/registry/index/
+    - ls -l ${CARGO_HOME}/registry/cache/
+    - ls -l ${CARGO_HOME}/git/db/
   cache:
     - key:
         files: 
