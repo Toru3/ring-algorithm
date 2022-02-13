@@ -7,15 +7,11 @@ image: "rust:latest"
     - cargo fmt --all -- --check
     - cargo test --all --verbose
   cache:
-    - key:
-        files: 
-          - Cargo.lock
-      paths:
-        - target/
-    - key: one-key-to-rule-them-all
-      paths:
-        - ${HOME}/.cargo/git/
-        - ${HOME}/.cargo/registry/
+    key:
+      files: 
+        - Cargo.lock
+    paths:
+      - target/
 
 # Use cargo to test the project
 test:stable:
