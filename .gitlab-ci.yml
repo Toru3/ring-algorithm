@@ -14,9 +14,8 @@ image: "rust:latest"
       - target/
     key: one-key-to-rule-them-all
     paths:
-      - ${HOME}/.cargo/git/db/
-      - ${HOME}/.cargo/registry/index/
-      - ${HOME}/.cargo/registry/cache/
+      - ${HOME}/.cargo/git/
+      - ${HOME}/.cargo/registry/
 
 # Use cargo to test the project
 test:stable:
