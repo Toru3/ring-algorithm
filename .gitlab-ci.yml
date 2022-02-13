@@ -2,10 +2,11 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
-    - rustup --version && rustup component add rustfmt
-    - rustc --version && cargo --version
+    - rustup component add rustfmt
+    - rustup --version && rustc --version && cargo --version
     - cargo fmt --all -- --check
-    - cargo test --all --verbose
+    - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
+    - cargo test --workspace --all-targets --all-features --verbose
   cache:
     - key:
         files: 
@@ -14,14 +15,17 @@ image: "rust:latest"
         - target/
     - key: one-key-to-rule-them-all
       paths:
-        - ${CARGO_HOME}/bin/
-        - ${CARGO_HOME}/registry/index/
-        - ${CARGO_HOME}/registry/cache/
-        - ${CARGO_HOME}/git/db/
+        # CARGO_HOME is /usr/local/cargo
+        - /usr/local/cargo/bin/
+        - /usr/local/cargo/registry/index/
+        - /usr/local/cargo/registry/cache/
+        - /usr/local/cargo/git/db/
 
 # Use cargo to test the project
 test:stable:
   <<: *run_test
+  before_script:
+    - rustup default stable
 
 test:beta:
   <<: *run_test
