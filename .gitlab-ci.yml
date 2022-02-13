@@ -7,22 +7,12 @@ image: "rust:latest"
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
-    - ls -l ${CARGO_HOME}/bin/
-    - ls -l ${CARGO_HOME}/registry/index/
-    - ls -l ${CARGO_HOME}/registry/cache/
   cache:
-    - key:
-        files: 
-          - Cargo.lock
-      paths:
-        - target/
-    - key: one-key-to-rule-them-all
-      paths:
-        # CARGO_HOME is /usr/local/cargo
-        - /usr/local/cargo/bin/
-        - /usr/local/cargo/registry/index/
-        - /usr/local/cargo/registry/cache/
-        - /usr/local/cargo/git/db/
+    key:
+      files: 
+        - Cargo.lock
+    paths:
+      - target/
 
 # Use cargo to test the project
 test:stable:
