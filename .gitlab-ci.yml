@@ -2,6 +2,7 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
+    - which cargo
     - rustup --version && rustup component add rustfmt
     - rustc --version && cargo --version
     - cargo fmt --all -- --check
