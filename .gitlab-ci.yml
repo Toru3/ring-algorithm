@@ -9,6 +9,9 @@ image: "rust:latest"
     - rustc --version && cargo --version
     - cargo fmt --all -- --check
     - cargo test --all --verbose
+  cache:
+    paths:
+      - target/
 
 # Use cargo to test the project
 test:stable:
