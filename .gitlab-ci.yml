@@ -3,6 +3,8 @@ image: "rust:latest"
 .run_test: &run_test
   script:
     - which cargo
+    - echo ${CARGO_HOME}
+    - ls  ${CARGO_HOME}
     - rustup --version && rustup component add rustfmt
     - rustc --version && cargo --version
     - cargo fmt --all -- --check
