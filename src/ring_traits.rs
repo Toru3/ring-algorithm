@@ -1,59 +1,41 @@
-pub trait UnitaryRing<Output = Self>:
+use num_traits::{One, Zero};
+use std::ops::{Add, Div, Mul, Rem, Sub};
+pub trait RingOperation: Sized + Add + Sub + Mul {}
+impl<T> RingOperation for T where T: Sized + Add + Sub + Mul {}
+pub trait RingOperationFrom:
     Sized
-    + Clone
-    + num_traits::Zero
-    + num_traits::One
-    + std::ops::Neg<Output = Output>
-    + for<'x> std::ops::AddAssign<&'x Self>
-    + for<'x> std::ops::SubAssign<&'x Self>
-    + for<'x> std::ops::MulAssign<&'x Self>
+    + for<'x> From<<&'x Self as Add>::Output>
+    + for<'x> From<<&'x Self as Sub>::Output>
+    + for<'x> From<<&'x Self as Mul>::Output>
+where
+    for<'x> &'x Self: RingOperation,
 {
 }
-impl<T> UnitaryRing for T where
+impl<T> RingOperationFrom for T
+where
     T: Sized
-        + Clone
-        + num_traits::Zero
-        + num_traits::One
-        + std::ops::Neg<Output = Self>
-        + for<'x> std::ops::AddAssign<&'x Self>
-        + for<'x> std::ops::SubAssign<&'x Self>
-        + for<'x> std::ops::MulAssign<&'x Self>
+        + for<'x> From<<&'x T as Add>::Output>
+        + for<'x> From<<&'x T as Sub>::Output>
+        + for<'x> From<<&'x T as Mul>::Output>,
+    for<'x> &'x T: RingOperation,
 {
 }
-pub trait EuclideanRing<Output = Self>:
-    UnitaryRing + for<'x> std::ops::DivAssign<&'x Self> + for<'x> std::ops::RemAssign<&'x Self>
+pub trait EuclideanRingOperation: RingOperation + Div + Rem {}
+impl<T> EuclideanRingOperation for T where T: RingOperation + Div + Rem {}
+pub trait EuclideanRingOperationFrom:
+    RingOperationFrom
+    + for<'x> From<<&'x Self as Div>::Output>
+    + for<'x> From<<&'x Self as Rem>::Output>
+where
+    for<'x> &'x Self: EuclideanRingOperation,
 {
 }
-impl<T> EuclideanRing for T where
-    T: UnitaryRing + for<'x> std::ops::DivAssign<&'x Self> + for<'x> std::ops::RemAssign<&'x Self>
-{
-}
-pub trait RingOperation<Output = Self>:
-    Sized
-    + std::ops::Add<Output = Output>
-    + std::ops::Sub<Output = Output>
-    + std::ops::Mul<Output = Output>
-{
-}
-impl<T> RingOperation<T> for T where
-    T: Sized + std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<Output = T>
-{
-}
-impl<'a, T> RingOperation<T> for &'a T where
-    &'a T:
-        Sized + std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<Output = T>
-{
-}
-pub trait EuclideanRingOperation<Output = Self>:
-    RingOperation<Output> + std::ops::Div<Output = Output> + std::ops::Rem<Output = Output>
-{
-}
-impl<T> EuclideanRingOperation<T> for T where
-    T: RingOperation<T> + std::ops::Div<Output = T> + std::ops::Rem<Output = T>
-{
-}
-impl<'a, T> EuclideanRingOperation<T> for &'a T where
-    &'a T: RingOperation<T> + std::ops::Div<Output = T> + std::ops::Rem<Output = T>
+impl<T> EuclideanRingOperationFrom for T
+where
+    T: RingOperationFrom
+        + for<'x> From<<&'x T as Div>::Output>
+        + for<'x> From<<&'x T as Rem>::Output>,
+    for<'x> &'x T: EuclideanRingOperation,
 {
 }
 /** Normarize ring element
@@ -92,7 +74,6 @@ macro_rules! ring_normalize {
     ($t:ty) => {
         impl RingNormalize for $t {
             fn leading_unit(&self) -> Self {
-                use num_traits::{One, Zero};
                 if self >= &Self::zero() {
                     Self::one()
                 } else {
@@ -109,7 +90,6 @@ macro_rules! ring_normalize_unsigned {
     ($t:ty) => {
         impl RingNormalize for $t {
             fn leading_unit(&self) -> Self {
-                use num_traits::One;
                 Self::one()
             }
             fn normalize_mut(&mut self) {}
@@ -133,7 +113,6 @@ ring_normalize_unsigned!(usize);
 #[cfg(feature = "num-bigint")]
 impl RingNormalize for num_bigint::BigInt {
     fn leading_unit(&self) -> Self {
-        use num_traits::One;
         if self.sign() == num_bigint::Sign::Minus {
             -Self::one()
         } else {
@@ -149,7 +128,6 @@ impl RingNormalize for num_bigint::BigInt {
 #[cfg(feature = "num-bigint")]
 impl RingNormalize for num_bigint::BigUint {
     fn leading_unit(&self) -> Self {
-        use num_traits::One;
         Self::one()
     }
     fn normalize_mut(&mut self) {}
@@ -157,7 +135,6 @@ impl RingNormalize for num_bigint::BigUint {
 #[cfg(feature = "rug")]
 impl RingNormalize for rug::Integer {
     fn leading_unit(&self) -> Self {
-        use num_traits::{One, Zero};
         if self < &Self::zero() {
             -Self::one()
         } else {

@@ -34,10 +34,10 @@ macro_rules! expand_poly {
 
 #[test]
 fn test_times() {
-    assert_eq!(times(42, 756), 42 * 756);
+    assert_eq!(times::<i32>(42, 756), 42 * 756);
     let a = expand_poly![[2], [1, 1], [2, 1], [3, 1]];
     let c = poly![42];
-    assert_eq!(times(a.clone(), 42), c * a);
+    assert_eq!(times::<Polynomial<num::Rational64>>(a.clone(), 42), c * a);
 }
 #[test]
 fn test_power() {
@@ -75,12 +75,12 @@ fn test_gcd2() {
 }
 fn check_eea<T>(a: T, b: T) -> bool
 where
-    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
     let g = gcd::<T>(a.clone(), b.clone());
     let (d, x, y) = extended_euclidian_algorithm::<T>(a.clone(), b.clone());
-    g.is_similar(&d) && &(&x * &a) + &(&y * &b) == d
+    g.is_similar(&d) && x * a + y * b == d
 }
 #[test]
 fn test_eea() {
@@ -105,12 +105,12 @@ fn test_eea2() {
 }
 fn check_neea<T>(a: T, b: T) -> bool
 where
-    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
     let g = gcd::<T>(a.clone(), b.clone());
     let (d, x, y) = normalized_extended_euclidian_algorithm::<T>(a.clone(), b.clone());
-    g.is_similar(&d) && &(&x * &a) + &(&y * &b) == d
+    g.is_similar(&d) && x * a + y * b == d
 }
 #[test]
 fn test_neea() {
@@ -135,10 +135,10 @@ fn test_neea2() {
 }
 fn check_mod_inv<T>(a: T, m: T) -> Option<T>
 where
-    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
-    modulo_inverse::<T>(a.clone(), m.clone()).map(|x| &(&(a * x) - &T::one()) % &m)
+    modulo_inverse::<T>(a.clone(), m.clone()).map(|x| T::from(&T::from(&(a * x) - &T::one()) % &m))
 }
 #[test]
 fn test_mod_inv() {
@@ -181,10 +181,11 @@ fn test_mod_inv2() {
 
 fn check_mod_div<T>(a: T, b: T, m: T) -> Option<T>
 where
-    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Zero + One + Clone + Eq + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
-    modulo_division::<T>(a.clone(), b.clone(), m.clone()).map(|x| &(&(b * x) - &a) % &m)
+    modulo_division::<T>(a.clone(), b.clone(), m.clone())
+        .map(|x| T::from(&T::from(&(b * x) - &a) % &m))
 }
 #[test]
 fn test_mod_div() {
@@ -204,12 +205,12 @@ fn test_mod_div() {
 }
 fn check_crt<T>(u: &[T], m: &[T])
 where
-    T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
     let a = chinese_remainder_theorem::<T>(u, m).unwrap();
     for (u, m) in u.iter().zip(m.iter()) {
-        assert!((&(&a - u) % m).is_zero());
+        assert!(T::from(&T::from(&a - u) % m).is_zero());
     }
 }
 #[test]
@@ -251,12 +252,12 @@ fn test_crt() {
 #[cfg(feature = "num-bigint")]
 fn check_fcrt<T>(u: &[T], m: &[T])
 where
-    T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize,
-    for<'x> &'x T: EuclideanRingOperation<T>,
+    T: sealed::Sized + Clone + Eq + Zero + One + RingNormalize + EuclideanRingOperationFrom,
+    for<'x> &'x T: EuclideanRingOperation,
 {
     let a = fast_chinese_remainder_theorem::<T>(u, m);
     for (u, m) in u.iter().zip(m.iter()) {
-        assert!((&(&a - u) % m).is_zero());
+        assert!(T::from(&T::from(&a - u) % m).is_zero());
     }
 }
 #[cfg(feature = "num-bigint")]
@@ -324,4 +325,179 @@ fn test_fcrt2() {
         .map(|m| Z::from(rand::random::<u128>()) % m)
         .collect::<Vec<_>>();
     check_fcrt::<Z>(&u, &m);
+}
+
+#[cfg(feature = "rug")]
+mod rug_test {
+    use super::*;
+    type Z = rug::Integer;
+    type Q = rug::Rational;
+    #[test]
+    fn test_times() {
+        let a = Z::from(42i32);
+        let b = 756;
+        assert_eq!(times::<Z>(a.clone(), b), a * 756i32);
+        let a = Q::from(3i32);
+        let b = Q::from(15i32);
+        assert_eq!(times::<Q>(a, 5), b);
+        //let a = poly![1i32, 2i32, 3i32];
+        //let c = poly![42i32];
+        //assert_eq!(times::<Polynomial<Q>>(a.clone(), 42), c * a);
+    }
+    #[test]
+    fn test_power() {
+        //type R = Polynomial<Q>;
+        let a = Z::from(3i32);
+        let b = Z::from(81i32);
+        assert_eq!(power::<Z>(a, 4), b);
+        let a = Q::from(3i32) / Q::from(2i32);
+        let b = Q::from(27i32) / Q::from(8i32);
+        assert_eq!(power::<Q>(a, 3), b);
+        //let a = poly![1, 1];
+        //let b = poly![1, 4, 6, 4, 1];
+        //assert_eq!(power::<R>(a, 4), b);
+    }
+    #[test]
+    fn test_gcd() {
+        let a = Z::from(42i32);
+        assert_eq!(gcd::<Z>(Z::zero(), Z::zero()), Z::zero());
+        assert_eq!(gcd::<Z>(a.clone(), Z::zero()), a.clone());
+        assert_eq!(gcd::<Z>(Z::zero(), a.clone()), a);
+        let b = Z::from(64i32);
+        let c = Z::from(58i32);
+        assert_eq!(gcd::<Z>(b, c), Z::from(2i32));
+        let d = Z::from(97i32);
+        let e = Z::from(89i32);
+        assert_eq!(gcd::<Z>(d, e), Z::one());
+    }
+    #[test]
+    fn test_coprime() {
+        let a = Z::from(-57i32);
+        let b = Z::from(-49i32);
+        assert!(is_coprime::<Z>(a, b));
+    }
+    fn check_eea(a: Z, b: Z) -> bool {
+        let g = gcd::<Z>(a.clone(), b.clone());
+        let (d, x, y) = extended_euclidian_algorithm::<Z>(a.clone(), b.clone());
+        g.is_similar(&d) && x * a + y * b == d
+    }
+    #[test]
+    fn test_eea() {
+        assert!(check_eea(Z::zero(), Z::zero()));
+        assert!(check_eea(Z::from(42i32), Z::zero()));
+        assert!(check_eea(Z::zero(), Z::from(42i32)));
+        assert!(check_eea(Z::from(64i32), Z::from(58i32)));
+        assert!(check_eea(Z::from(97i32), Z::from(89i32)));
+    }
+    fn check_neea(a: Z, b: Z) -> bool {
+        let g = gcd::<Z>(a.clone(), b.clone());
+        let (d, x, y) = normalized_extended_euclidian_algorithm::<Z>(a.clone(), b.clone());
+        g.is_similar(&d) && x * a + y * b == d
+    }
+    #[test]
+    fn test_neea() {
+        assert!(check_neea(Z::zero(), Z::zero()));
+        assert!(check_neea(Z::from(42i32), Z::zero()));
+        assert!(check_neea(Z::zero(), Z::from(42i32)));
+        assert!(check_neea(Z::from(64i32), Z::from(58i32)));
+        assert!(check_neea(Z::from(97i32), Z::from(89i32)));
+    }
+    fn check_mod_inv(a: i32, m: i32) -> Option<i32> {
+        use std::convert::TryFrom;
+        let a = Z::from(a);
+        let m = Z::from(m);
+        modulo_inverse::<Z>(a.clone(), m.clone())
+            .map(|x| (a * x - Z::one()) % m)
+            .map(|x| i32::try_from(x).unwrap())
+    }
+    #[test]
+    fn test_mod_inv() {
+        // not exists inverse
+        assert_eq!(check_mod_inv(0, 0), None);
+        assert_eq!(check_mod_inv(42, 0), None);
+        assert_eq!(check_mod_inv(0, 42), None);
+        assert_eq!(check_mod_inv(64, 58), None);
+        // exists inverse
+        assert_eq!(check_mod_inv(97, 89), Some(0));
+        assert_eq!(check_mod_inv(7, 15), Some(0));
+        assert_eq!(check_mod_inv(42, 55), Some(0));
+        assert_eq!(check_mod_inv(15, 64), Some(0));
+    }
+    fn check_mod_div(a: i32, b: i32, m: i32) -> Option<i32> {
+        use std::convert::TryFrom;
+        let a = Z::from(a);
+        let b = Z::from(b);
+        let m = Z::from(m);
+        modulo_division::<Z>(a.clone(), b.clone(), m.clone())
+            .map(|x| i32::try_from((b * x - a) % m).unwrap())
+    }
+    #[test]
+    fn test_mod_div() {
+        // not exists inverse
+        assert_eq!(check_mod_div(0, 0, 0), None);
+        assert_eq!(check_mod_div(0, 42, 0), None);
+        assert_eq!(check_mod_div(0, 0, 42), None);
+        assert_eq!(check_mod_div(6, 4, 8), None);
+        assert_eq!(check_mod_div(1, 3, 6), None);
+        // exists inverse
+        assert_eq!(check_mod_div(1, 97, 89), Some(0));
+        assert_eq!(check_mod_div(1, 7, 15), Some(0));
+        assert_eq!(check_mod_div(1, 42, 55), Some(0));
+        assert_eq!(check_mod_div(1, 15, 64), Some(0));
+        assert_eq!(check_mod_div(6, 2, 8), Some(0));
+        assert_eq!(check_mod_div(6, 9, 12), Some(0));
+    }
+    fn check_fcrt(u: &[Z], m: &[Z]) {
+        let a = fast_chinese_remainder_theorem::<Z>(u, m);
+        for (u, m) in u.iter().zip(m.iter()) {
+            assert!(Z::from(&Z::from(&a - u) % m).is_zero());
+        }
+    }
+    #[test]
+    fn test_fcrt() {
+        let u = vec![2i32, 3, 2, 6]
+            .into_iter()
+            .map(Z::from)
+            .collect::<Vec<_>>();
+        let m = vec![3i32, 5, 7, 11]
+            .into_iter()
+            .map(Z::from)
+            .collect::<Vec<_>>();
+        check_fcrt(&u, &m);
+        let u = vec![3i32, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3]
+            .into_iter()
+            .map(Z::from)
+            .collect::<Vec<_>>();
+        let m = vec![
+            2i32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+        ]
+        .into_iter()
+        .map(Z::from)
+        .collect::<Vec<_>>();
+        check_fcrt(&u, &m);
+    }
+    fn make_prime_list(n: usize) -> Vec<u64> {
+        let mut v = Vec::with_capacity(n);
+        for p in 2.. {
+            if p.is_prime() {
+                v.push(p);
+                if v.len() >= n {
+                    return v;
+                }
+            }
+        }
+        unreachable!()
+    }
+    #[test]
+    fn test_fcrt2() {
+        let m = make_prime_list(8192)
+            .into_iter()
+            .map(Z::from)
+            .collect::<Vec<_>>();
+        let u = m
+            .iter()
+            .map(|m| Z::from(rand::random::<u128>()) % m)
+            .collect::<Vec<_>>();
+        check_fcrt(&u, &m);
+    }
 }
