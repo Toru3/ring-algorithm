@@ -361,7 +361,7 @@ mod rug_test {
     fn test_gcd() {
         let a = Z::from(42i32);
         assert_eq!(gcd::<Z>(Z::zero(), Z::zero()), Z::zero());
-        assert_eq!(gcd::<Z>(a.clone(), Z::zero()), a.clone());
+        assert_eq!(gcd::<Z>(a.clone(), Z::zero()), a);
         assert_eq!(gcd::<Z>(Z::zero(), a.clone()), a);
         let b = Z::from(64i32);
         let c = Z::from(58i32);
