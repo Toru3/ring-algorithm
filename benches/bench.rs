@@ -4,7 +4,7 @@ use criterion::{
 };
 use is_prime_for_primitive_int::IsPrime;
 use ring_algorithm::*;
-type Z = num::BigInt;
+type Z = rug::Integer;
 
 fn make_input(len: usize) -> (Vec<Z>, Vec<Z>) {
     let mut u = Vec::with_capacity(len);
