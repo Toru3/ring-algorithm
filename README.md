@@ -8,7 +8,7 @@ Algorithms on ring.
 * CRT (Chinese Remainder Theorem)
 # ChangeLog
 * 0.5.0
-    * **breaking change** `RingOperation` and `RingOperationFrom` changed
+    * **breaking change** `RingOperation` and `EuclideanRingOperation` changed
     * **feature** Add `rug::Integer` support
 # Licence
 AGPL-3.0-or-later
