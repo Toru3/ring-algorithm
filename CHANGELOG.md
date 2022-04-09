@@ -4,10 +4,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - `modulo_power`
-### Change
+### Changed
 - second argument type of `times`, `power` is changed from `u64` to `U` (generic type)
 ## [0.5.0] - 2022-02-26
 ### Added
 - `rug::Integer` support
-### Change
+### Changed
 - `RingOperation` and `EuclideanRingOperation` changed
