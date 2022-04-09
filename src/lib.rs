@@ -489,7 +489,7 @@ where
     crt_combination::<T>(&c, m, &v, 1, 0, len)
 }
 
-/** power in modulo
+/** calcurate $`a^p \pmod{m}`$
 
 ```rust
 use ring_algorithm::modulo_power;
@@ -516,7 +516,7 @@ where
     for<'x> &'x U: BitAnd,
 {
     let mut x = T::one();
-    let mut y = a;
+    let mut y = T::from(&a % m);
     loop {
         if U::from(&p & &U::one()) == U::one() {
             x = T::from(&T::from(&x * &y) % m);
