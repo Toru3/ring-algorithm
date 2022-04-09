@@ -34,18 +34,21 @@ macro_rules! expand_poly {
 
 #[test]
 fn test_times() {
-    assert_eq!(times::<i32>(42, 756), 42 * 756);
+    assert_eq!(times::<i32, u64>(42, 756), 42 * 756);
     let a = expand_poly![[2], [1, 1], [2, 1], [3, 1]];
     let c = poly![42];
-    assert_eq!(times::<Polynomial<num::Rational64>>(a.clone(), 42), c * a);
+    assert_eq!(
+        times::<Polynomial<num::Rational64>, u64>(a.clone(), 42),
+        c * a
+    );
 }
 #[test]
 fn test_power() {
     type R = Polynomial<num::Rational64>;
-    assert_eq!(power::<i32>(3, 4), 81);
+    assert_eq!(power::<i32, u64>(3, 4), 81);
     let a = poly![1, 1];
     let b = poly![1, 4, 6, 4, 1];
-    assert_eq!(power::<R>(a, 4), b);
+    assert_eq!(power::<R, u64>(a, 4), b);
 }
 #[test]
 fn test_gcd() {
@@ -175,7 +178,7 @@ fn test_mod_inv2() {
     let b = expand_poly![[5, 1], [11, 1]];
     assert_eq!(check_mod_inv::<R>(a, b), sz);
     let a = expand_poly![[3, 1], [5, 1]];
-    let b = power::<R>(poly![2, 1], 6);
+    let b = power::<R, u64>(poly![2, 1], 6);
     assert_eq!(check_mod_inv::<R>(a, b), sz);
 }
 
@@ -326,6 +329,22 @@ fn test_fcrt2() {
         .collect::<Vec<_>>();
     check_fcrt::<Z>(&u, &m);
 }
+#[cfg(feature = "num-bigint")]
+#[test]
+fn test_modulo_power() {
+    use num::BigInt;
+    let a = BigInt::from(314i32);
+    let p = BigInt::from(271i32);
+    let m = BigInt::from(42i32);
+    assert_eq!(
+        modulo_power::<BigInt, BigInt>(a, p, &m),
+        BigInt::from(20i32)
+    );
+    let a = BigInt::from(314i32);
+    let p = 271u64;
+    let m = BigInt::from(42i32);
+    assert_eq!(modulo_power::<BigInt, u64>(a, p, &m), BigInt::from(20i32));
+}
 
 #[cfg(feature = "rug")]
 mod rug_test {
@@ -336,10 +355,10 @@ mod rug_test {
     fn test_times() {
         let a = Z::from(42i32);
         let b = 756;
-        assert_eq!(times::<Z>(a.clone(), b), a * 756i32);
+        assert_eq!(times::<Z, u64>(a.clone(), b), a * 756i32);
         let a = Q::from(3i32);
         let b = Q::from(15i32);
-        assert_eq!(times::<Q>(a, 5), b);
+        assert_eq!(times::<Q, u64>(a, 5), b);
         //let a = poly![1i32, 2i32, 3i32];
         //let c = poly![42i32];
         //assert_eq!(times::<Polynomial<Q>>(a.clone(), 42), c * a);
@@ -349,10 +368,10 @@ mod rug_test {
         //type R = Polynomial<Q>;
         let a = Z::from(3i32);
         let b = Z::from(81i32);
-        assert_eq!(power::<Z>(a, 4), b);
+        assert_eq!(power::<Z, u64>(a, 4), b);
         let a = Q::from(3i32) / Q::from(2i32);
         let b = Q::from(27i32) / Q::from(8i32);
-        assert_eq!(power::<Q>(a, 3), b);
+        assert_eq!(power::<Q, u64>(a, 3), b);
         //let a = poly![1, 1];
         //let b = poly![1, 4, 6, 4, 1];
         //assert_eq!(power::<R>(a, 4), b);
@@ -499,5 +518,20 @@ mod rug_test {
             .map(|m| Z::from(rand::random::<u128>()) % m)
             .collect::<Vec<_>>();
         check_fcrt(&u, &m);
+    }
+    #[test]
+    fn test_modulo_power() {
+        use rug::Integer;
+        let a = Integer::from(314i32);
+        let p = Integer::from(271i32);
+        let m = Integer::from(42i32);
+        assert_eq!(
+            modulo_power::<Integer, Integer>(a, p, &m),
+            Integer::from(20i32)
+        );
+        let a = Integer::from(314i32);
+        let p = 271u64;
+        let m = Integer::from(42i32);
+        assert_eq!(modulo_power::<Integer, u64>(a, p, &m), Integer::from(20i32));
     }
 }

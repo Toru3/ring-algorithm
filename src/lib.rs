@@ -1,6 +1,6 @@
 #![cfg_attr(feature = "__internal_inject_debug", recursion_limit = "8")]
 use num_traits::{One, Zero};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Rem};
+use std::ops::{Add, AddAssign, BitAnd, Mul, MulAssign, Rem, ShrAssign};
 mod sealed {
     pub trait SizedExt: std::marker::Sized + std::fmt::Debug + std::fmt::Display {}
     impl<T> SizedExt for T where T: std::marker::Sized + std::fmt::Debug + std::fmt::Display {}
@@ -20,22 +20,29 @@ pub use ring_traits::{
 /** calcurate $`pa`$ with mutliprecation by doubling
 ```
 use ring_algorithm::times;
-assert_eq!(times::<i32>(2, 16), 32);
+assert_eq!(times::<i32, u64>(2, 16), 32);
 ```
 */
-pub fn times<T>(a: T, mut p: u64) -> T
+pub fn times<T, U>(a: T, mut p: U) -> T
 where
     T: sealed::Sized + Zero + for<'x> AddAssign<&'x T> + for<'x> From<<&'x T as Add>::Output>,
     for<'x> &'x T: Add,
+    U: sealed::Sized
+        + Zero
+        + One
+        + Eq
+        + for<'x> ShrAssign<usize>
+        + for<'x> From<<&'x U as BitAnd>::Output>,
+    for<'x> &'x U: BitAnd,
 {
     let mut x = T::zero();
     let mut y = a;
     loop {
-        if p % 2 == 1 {
+        if U::from(&p & &U::one()) == U::one() {
             x += &y;
         }
-        p /= 2;
-        if p == 0 {
+        p >>= 1;
+        if p == U::zero() {
             break;
         }
         y = T::from(&y + &y);
@@ -46,22 +53,29 @@ where
 /** calcurate $`a^p`$ with exponentiation by squaring
 ```
 use ring_algorithm::power;
-assert_eq!(power::<i32>(2, 16), 65536);
+assert_eq!(power::<i32, u64>(2, 16), 65536);
 ```
 */
-pub fn power<T>(a: T, mut p: u64) -> T
+pub fn power<T, U>(a: T, mut p: U) -> T
 where
     T: sealed::Sized + One + for<'x> MulAssign<&'x T> + for<'x> From<<&'x T as Mul>::Output>,
     for<'x> &'x T: Mul,
+    U: sealed::Sized
+        + Zero
+        + One
+        + Eq
+        + for<'x> ShrAssign<usize>
+        + for<'x> From<<&'x U as BitAnd>::Output>,
+    for<'x> &'x U: BitAnd,
 {
     let mut x = T::one();
     let mut y = a;
     loop {
-        if p % 2 == 1 {
+        if U::from(&p & &U::one()) == U::one() {
             x *= &y;
         }
-        p /= 2;
-        if p == 0 {
+        p >>= 1;
+        if p == U::zero() {
             break;
         }
         y = T::from(&y * &y);
@@ -473,4 +487,45 @@ where
         .map(|(s, u)| T::from(s * u))
         .collect::<Vec<_>>();
     crt_combination::<T>(&c, m, &v, 1, 0, len)
+}
+
+/** power in modulo
+
+```rust
+use ring_algorithm::modulo_power;
+let a = 314i32;
+let p = 271i32;
+let m = 42;
+assert_eq!(modulo_power(a, p, &m), 20);
+```
+*/
+pub fn modulo_power<T, U>(a: T, mut p: U, m: &T) -> T
+where
+    T: sealed::Sized
+        + One
+        + for<'x> MulAssign<&'x T>
+        + for<'x> From<<&'x T as Mul>::Output>
+        + for<'x> From<<&'x T as Rem>::Output>,
+    for<'x> &'x T: Mul + Rem,
+    U: sealed::Sized
+        + Zero
+        + One
+        + Eq
+        + for<'x> ShrAssign<usize>
+        + for<'x> From<<&'x U as BitAnd>::Output>,
+    for<'x> &'x U: BitAnd,
+{
+    let mut x = T::one();
+    let mut y = a;
+    loop {
+        if U::from(&p & &U::one()) == U::one() {
+            x = T::from(&T::from(&x * &y) % m);
+        }
+        p >>= 1;
+        if p == U::zero() {
+            break;
+        }
+        y = T::from(&T::from(&y * &y) % m);
+    }
+    x
 }
