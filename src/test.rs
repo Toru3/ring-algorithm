@@ -422,7 +422,6 @@ mod rug_test {
         assert!(check_neea(Z::from(97i32), Z::from(89i32)));
     }
     fn check_mod_inv(a: i32, m: i32) -> Option<i32> {
-        use std::convert::TryFrom;
         let a = Z::from(a);
         let m = Z::from(m);
         modulo_inverse::<Z>(a.clone(), m.clone())
@@ -443,7 +442,6 @@ mod rug_test {
         assert_eq!(check_mod_inv(15, 64), Some(0));
     }
     fn check_mod_div(a: i32, b: i32, m: i32) -> Option<i32> {
-        use std::convert::TryFrom;
         let a = Z::from(a);
         let b = Z::from(b);
         let m = Z::from(m);
