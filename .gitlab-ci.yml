@@ -5,6 +5,7 @@ image: "rust:latest"
     - rustup update
     - rustup component add rustfmt clippy
     - rustup --version && rustc --version && cargo --version
+    - cargo fetch
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
