@@ -1,4 +1,4 @@
-#![cfg_attr(feature = "__internal_inject_debug", recursion_limit = "8")]
+#![cfg_attr(feature = "__internal_inject_debug", recursion_limit = "16")]
 use num_traits::{One, Zero};
 use std::ops::{Add, AddAssign, BitAnd, Mul, MulAssign, Rem, ShrAssign};
 mod sealed {

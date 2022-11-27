@@ -8,12 +8,6 @@ image: "rust:latest"
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features --verbose -- -D warnings
     - cargo test --workspace --all-targets --all-features --verbose
-  cache:
-    key:
-      files:
-        - Cargo.lock
-    paths:
-      - target/
 
 # Use cargo to test the project
 test:stable:
@@ -25,3 +19,8 @@ test:beta:
   <<: *run_test
   before_script:
     - rustup default beta
+
+test:msrv:
+  <<: *run_test
+  before_script:
+    - rustup default 1.61.0
