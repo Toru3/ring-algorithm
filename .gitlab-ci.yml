@@ -38,32 +38,32 @@ image: "rust:latest"
 test:stable:
   <<: *run_test
   variables:
-    - RUST_VERSION: stable
+    RUST_VERSION: "stable"
 
 test:beta:
   <<: *run_test
   variables:
-    - RUST_VERSION: beta
+    RUST_VERSION: "beta"
 
 test:msrv:
   <<: *run_test
   variables:
-    - RUST_VERSION: 1.65.0
+    RUST_VERSION: "1.65.0"
 
 test:stable:min_ver:
   <<: *run_test
   variables:
-    - RUST_VERSION: stable
-    - USE_MINIMAL_VERSIONS: true
+    RUST_VERSION: "stable"
+    USE_MINIMAL_VERSIONS: "true"
 
 test:beta:min_ver:
   <<: *run_test
   variables:
-    - RUST_VERSION: beta
-    - USE_MINIMAL_VERSIONS: true
+    RUST_VERSION: "beta"
+    USE_MINIMAL_VERSIONS: "true"
 
 test:msrv:min_ver:
   <<: *run_test
   variables:
-    - RUST_VERSION: 1.65.0
-    - USE_MINIMAL_VERSIONS: true
+    RUST_VERSION: "1.65.0"
+    USE_MINIMAL_VERSIONS: "true"
