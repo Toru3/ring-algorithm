@@ -14,11 +14,11 @@ image: "rust:latest"
     - rustup --version && rustc --version && cargo --version
     - if [ "x$USE_MINIMAL_VERSIONS" = "xtrue" ]; then
     -     rustup install nightly
-    -     cargo +nightly update -Z minimal-versions
+    -     time cargo +nightly update -Z minimal-versions
     - else
-    -     cargo update
+    -     time cargo update
     - fi
-    - time cargo fetch
+    - cargo fetch
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features -- -D warnings
     - cargo test --workspace --all-targets --all-features
