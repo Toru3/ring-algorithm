@@ -41,4 +41,4 @@ test:beta:
 test:msrv:
   <<: *run_test
   before_script:
-    - rustup default 1.61.0
+    - rustup default 1.65.0
