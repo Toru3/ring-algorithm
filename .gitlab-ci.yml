@@ -2,7 +2,6 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
-    - rustup update
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
     - rustup default "$RUST_VERSION"
     - if [ "x$DISABLE_CACHE" != "xtrue" ]; then
