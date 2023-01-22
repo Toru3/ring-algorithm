@@ -2,6 +2,8 @@ image: "rust:latest"
 
 .run_test: &run_test
   script:
+    - rustup update
+    - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
     - rustup default "$RUST_VERSION"
     - if [ "x$DISABLE_CACHE" != "xtrue" ]; then
     -     export CARGO_HOME="$CI_PROJECT_DIR/cargo"
@@ -10,8 +12,6 @@ image: "rust:latest"
     -     ln -s /usr/local/cargo/env $CARGO_HOME/env
     -     ln -s target_cache target
     - fi
-    - rustup update
-    - rustup component add rustfmt clippy
     - rustup --version && rustc --version && cargo --version
     - if [ "x$USE_MINIMAL_VERSIONS" = "xtrue" ]; then
     -     rustup install nightly
@@ -45,6 +45,12 @@ test:beta:
   variables:
     RUST_VERSION: "beta"
 
+test:nightly:
+  <<: *run_test
+  variables:
+    RUST_VERSION: "nightly"
+  allow_failure: true  
+
 test:msrv:
   <<: *run_test
   variables:
@@ -61,6 +67,13 @@ test:beta:min_ver:
   variables:
     RUST_VERSION: "beta"
     USE_MINIMAL_VERSIONS: "true"
+
+test:nightly:min_ver:
+  <<: *run_test
+  variables:
+    RUST_VERSION: "nightly"
+    USE_MINIMAL_VERSIONS: "true"
+  allow_failure: true  
 
 test:msrv:min_ver:
   <<: *run_test
