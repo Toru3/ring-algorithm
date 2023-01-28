@@ -22,7 +22,8 @@ test:
     - cargo fetch
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features -- -D warnings
-    - cargo test --workspace --all-features -- -Z unstable-options --format=junit --report-time > test.xml
+    - cargo test --lib --workspace --all-features -- -Z unstable-options --format=junit --report-time > lib.xml
+    - cargo test --doc --workspace --all-features -- -Z unstable-options --format=junit --report-time > doc.xml
   cache:
     - key: "crates.io"
       paths:
@@ -36,9 +37,11 @@ test:
   artifacts:
     when: always
     paths:
-      - test.xml
+      - lib.xml
+      - doc.xml
     reports:
-      junit: test.xml
+      junit: lib.xml
+      junit: doc.xml
   variables:
     CARGO_UNSTABLE_SPARSE_REGISTRY: "true"
     CARGO_LOG: "cargo::sources::registry::http_remote=debug"
