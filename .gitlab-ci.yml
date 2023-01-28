@@ -3,9 +3,11 @@ image: "rust:latest"
 test:
   stage: test
   script:
+    # ツールのインストール
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
     - rustup install nightly
     - rustup default "$RUST_VERSION"
+    # キャッシュの設定
     - if [ "${DISABLE_CACHE:-false}" = "false" ]; then
     -     export CARGO_HOME="$CI_PROJECT_DIR/cargo"
     -     mkdir -p $CARGO_HOME target_cache
@@ -13,15 +15,18 @@ test:
     -     ln -s /usr/local/cargo/env $CARGO_HOME/env
     -     ln -s target_cache target
     - fi
+    # 現在のversionの表示
     - rustup --version && cargo --version
+    # Cargo.lock の更新
     - if [ "${USE_MINIMAL_VERSIONS:-false}" = "false" ]; then
     -     time cargo +nightly update
     - else
     -     time cargo +nightly update -Z minimal-versions
     - fi
-    - cargo fetch
-    - cargo fmt --all --check --verbose
+    - cargo fetch # ソースコードのダウンロード
+    - cargo fmt --all --check --verbose # フォーマットチェック
     - cargo clippy --workspace --all-targets "$FEATURES" -- -D warnings
+    # テストを実行し結果をJUnit形式で出力
     - cargo test --lib --workspace "$FEATURES" -- -Z unstable-options --format=junit --report-time > lib.xml
     - cargo test --doc --workspace "$FEATURES" -- -Z unstable-options --format=junit --report-time > doc.xml
   cache:
