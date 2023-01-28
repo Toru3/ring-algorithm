@@ -3,8 +3,6 @@ image: "rust:latest"
 test:
   stage: test
   script:
-    - export CARGO_UNSTABLE_SPARSE_REGISTRY=true
-    - export CARGO_LOG=cargo::sources::registry::http_remote=debug
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
     - rustup install nightly
     - rustup default "$RUST_VERSION"
@@ -35,6 +33,9 @@ test:
     - key: "target"
       paths:
         - target_cache/
+  variables:
+    CARGO_UNSTABLE_SPARSE_REGISTRY: "true"
+    CARGO_LOG: "cargo::sources::registry::http_remote=debug"
   parallel:
     matrix:
       - RUST_VERSION:
