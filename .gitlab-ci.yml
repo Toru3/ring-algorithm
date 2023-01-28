@@ -6,7 +6,7 @@ test:
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
     - rustup install nightly
     - rustup default "$RUST_VERSION"
-    - if [ "${DISABLE_CACHE:-false}" != "false" ]; then
+    - if [ "${DISABLE_CACHE:-false}" != "true" ]; then
     -     export CARGO_HOME="$CI_PROJECT_DIR/cargo"
     -     mkdir -p $CARGO_HOME target_cache
     -     ln -s /usr/local/cargo/bin $CARGO_HOME/bin
