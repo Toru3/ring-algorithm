@@ -1,22 +1,25 @@
 image: "rust:latest"
 
-.run_test: &run_test
+test:
+  stage: test
   script:
+    - export CARGO_UNSTABLE_SPARSE_REGISTRY=true
+    - export CARGO_LOG=cargo::sources::registry::http_remote=trace
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
+    - rustup install nightly
     - rustup default "$RUST_VERSION"
-    - if [ "x$DISABLE_CACHE" != "xtrue" ]; then
+    - if [ "${DISABLE_CACHE:-false}" != "false" ]; then
     -     export CARGO_HOME="$CI_PROJECT_DIR/cargo"
     -     mkdir -p $CARGO_HOME target_cache
     -     ln -s /usr/local/cargo/bin $CARGO_HOME/bin
     -     ln -s /usr/local/cargo/env $CARGO_HOME/env
     -     ln -s target_cache target
     - fi
-    - rustup --version && rustc --version && cargo --version
-    - if [ "x$USE_MINIMAL_VERSIONS" = "xtrue" ]; then
-    -     rustup install nightly
-    -     time cargo +nightly update -Z minimal-versions
+    - rustup --version && cargo --version
+    - if [ "${USE_MINIMAL_VERSIONS:-false}" != "false" ]; then
+    -     time cargo +nightly update -Z sparse-registry -Z minimal-versions
     - else
-    -     time cargo update
+    -     time cargo +nightly update -Z sparse-registry
     - fi
     - cargo fetch
     - cargo fmt --all --check --verbose
@@ -32,50 +35,13 @@ image: "rust:latest"
     - key: "target"
       paths:
         - target_cache/
-
-# Use cargo to test the project
-test:stable:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "stable"
-
-test:beta:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "beta"
-
-test:nightly:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "nightly"
-  allow_failure: true  
-
-test:msrv:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "1.65.0"
-
-test:stable:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "stable"
-    USE_MINIMAL_VERSIONS: "true"
-
-test:beta:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "beta"
-    USE_MINIMAL_VERSIONS: "true"
-
-test:nightly:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "nightly"
-    USE_MINIMAL_VERSIONS: "true"
-  allow_failure: true  
-
-test:msrv:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "1.65.0"
-    USE_MINIMAL_VERSIONS: "true"
+  paralell:
+    matrix:
+      - RUST_VERSION:
+        - "stable"
+        - "beta"
+        - "nightly"
+        - "1.65.0"
+      - USE_MINIMAL_VERSIONS:
+        - "false"
+        - "true"
