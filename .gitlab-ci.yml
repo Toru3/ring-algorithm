@@ -14,10 +14,10 @@ test:
     -     ln -s target_cache target
     - fi
     - rustup --version && cargo --version
-    - if [ "${USE_MINIMAL_VERSIONS:-false}" != "false" ]; then
-    -     time cargo +nightly update -Z minimal-versions
-    - else
+    - if [ "${USE_MINIMAL_VERSIONS:-false}" = "false" ]; then
     -     time cargo +nightly update
+    - else
+    -     time cargo +nightly update -Z minimal-versions
     - fi
     - cargo fetch
     - cargo fmt --all --check --verbose
