@@ -56,7 +56,6 @@ test:
       - RUST_VERSION:
         - "stable"
         - "beta"
-        #- "nightly"
         - "1.65.0" # MSRV
         USE_MINIMAL_VERSIONS:
         - "false"
