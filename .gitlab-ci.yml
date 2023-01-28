@@ -35,7 +35,7 @@ test:
     - key: "target"
       paths:
         - target_cache/
-  paralell:
+  parallel:
     matrix:
       - RUST_VERSION:
         - "stable"
