@@ -40,7 +40,9 @@ test:
       - lib.xml
       - doc.xml
     reports:
-      junit: lib.xml doc.xml
+      junit:
+        - lib.xml
+        - doc.xml
   variables:
     CARGO_UNSTABLE_SPARSE_REGISTRY: "true"
     CARGO_LOG: "cargo::sources::registry::http_remote=debug"
