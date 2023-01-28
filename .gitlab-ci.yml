@@ -24,7 +24,7 @@ test:
     - cargo fetch
     - cargo fmt --all --check --verbose
     - cargo clippy --workspace --all-targets --all-features -- -D warnings
-    - cargo test --workspace --all-targets --all-features
+    - cargo test --workspace --all-targets --all-features -- -Z unstable-options --format=junit --report-time
   cache:
     - key: "crates.io"
       paths:
