@@ -62,6 +62,12 @@ test:
         - "false"
         - "true"
         FEATURES:
+        - "--all-features"
+      - RUST_VERSION:
+        - "stable"
+        USE_MINIMAL_VERSIONS:
+        - "false"
+        FEATURES:
         - "--no-default-features"
         - "--no-default-features --features num-bigint"
         - "--no-default-features --features rug"
