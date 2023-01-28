@@ -1,27 +1,34 @@
 image: "rust:latest"
 
-.run_test: &run_test
+test:
+  stage: test
   script:
+    # ツールのインストール
     - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
+    - rustup install nightly
     - rustup default "$RUST_VERSION"
-    - if [ "x$DISABLE_CACHE" != "xtrue" ]; then
+    # キャッシュの設定
+    - if [ "${DISABLE_CACHE:-false}" = "false" ]; then
     -     export CARGO_HOME="$CI_PROJECT_DIR/cargo"
     -     mkdir -p $CARGO_HOME target_cache
     -     ln -s /usr/local/cargo/bin $CARGO_HOME/bin
     -     ln -s /usr/local/cargo/env $CARGO_HOME/env
     -     ln -s target_cache target
     - fi
-    - rustup --version && rustc --version && cargo --version
-    - if [ "x$USE_MINIMAL_VERSIONS" = "xtrue" ]; then
-    -     rustup install nightly
-    -     time cargo +nightly update -Z minimal-versions
+    # 現在のversionの表示
+    - rustup --version && cargo --version
+    # Cargo.lock の更新
+    - if [ "${USE_MINIMAL_VERSIONS:-false}" = "false" ]; then
+    -     time cargo +nightly update
     - else
-    -     time cargo update
+    -     time cargo +nightly update -Z minimal-versions
     - fi
-    - cargo fetch
-    - cargo fmt --all --check --verbose
-    - cargo clippy --workspace --all-targets --all-features -- -D warnings
-    - cargo test --workspace --all-targets --all-features
+    - cargo fetch # ソースコードのダウンロード
+    - cargo fmt --all --check --verbose # フォーマットチェック
+    - cargo clippy --workspace --all-targets $FEATURES -- -D warnings
+    # テストを実行し結果をJUnit形式で出力
+    - cargo test --lib --workspace $FEATURES -- -Z unstable-options --format=junit --report-time > lib.xml
+    - cargo test --doc --workspace $FEATURES -- -Z unstable-options --format=junit --report-time > doc.xml
   cache:
     - key: "crates.io"
       paths:
@@ -32,50 +39,35 @@ image: "rust:latest"
     - key: "target"
       paths:
         - target_cache/
-
-# Use cargo to test the project
-test:stable:
-  <<: *run_test
+  artifacts:
+    when: always
+    paths:
+      - lib.xml
+      - doc.xml
+    reports:
+      junit:
+        - lib.xml
+        - doc.xml
   variables:
-    RUST_VERSION: "stable"
-
-test:beta:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "beta"
-
-test:nightly:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "nightly"
-  allow_failure: true  
-
-test:msrv:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "1.65.0"
-
-test:stable:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "stable"
-    USE_MINIMAL_VERSIONS: "true"
-
-test:beta:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "beta"
-    USE_MINIMAL_VERSIONS: "true"
-
-test:nightly:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "nightly"
-    USE_MINIMAL_VERSIONS: "true"
-  allow_failure: true  
-
-test:msrv:min_ver:
-  <<: *run_test
-  variables:
-    RUST_VERSION: "1.65.0"
-    USE_MINIMAL_VERSIONS: "true"
+    CARGO_UNSTABLE_SPARSE_REGISTRY: "true"
+    CARGO_LOG: "cargo::sources::registry::http_remote=debug"
+  parallel:
+    matrix:
+      - RUST_VERSION:
+        - "stable"
+        - "beta"
+        - "1.65.0" # MSRV
+        USE_MINIMAL_VERSIONS:
+        - "false"
+        - "true"
+        FEATURES:
+        - "--all-features"
+      - RUST_VERSION:
+        - "stable"
+        USE_MINIMAL_VERSIONS:
+        - "false"
+        FEATURES:
+        - "--no-default-features"
+        - "--no-default-features --features num-bigint"
+        - "--no-default-features --features rug"
+        - "--all-features"

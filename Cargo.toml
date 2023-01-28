@@ -36,3 +36,4 @@ rustdoc-args = [
 [[bench]]
 name = "bench"
 harness = false
+required-features = ["rug"]

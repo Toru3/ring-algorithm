@@ -1,6 +1,5 @@
 use crate::sealed;
 use crate::*;
-use is_prime_for_primitive_int::IsPrime;
 use num_traits::{One, Zero};
 use polynomial_ring::Polynomial;
 
@@ -303,6 +302,7 @@ fn test_fcrt() {
 }
 #[cfg(feature = "num-bigint")]
 fn make_prime_list(n: usize) -> Vec<u64> {
+    use is_prime_for_primitive_int::IsPrime;
     let mut v = Vec::with_capacity(n);
     for p in 2.. {
         if p.is_prime() {
@@ -349,6 +349,7 @@ fn test_modulo_power() {
 #[cfg(feature = "rug")]
 mod rug_test {
     use super::*;
+    use is_prime_for_primitive_int::IsPrime;
     type Z = rug::Integer;
     type Q = rug::Rational;
     #[test]
