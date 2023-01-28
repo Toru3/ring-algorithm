@@ -42,6 +42,6 @@ test:
         - "beta"
         - "nightly"
         - "1.65.0"
-      - USE_MINIMAL_VERSIONS:
+        USE_MINIMAL_VERSIONS:
         - "false"
         - "true"
