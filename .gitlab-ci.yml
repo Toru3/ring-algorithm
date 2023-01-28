@@ -21,9 +21,9 @@ test:
     - fi
     - cargo fetch
     - cargo fmt --all --check --verbose
-    - cargo clippy --workspace --all-targets --all-features -- -D warnings
-    - cargo test --lib --workspace --all-features -- -Z unstable-options --format=junit --report-time > lib.xml
-    - cargo test --doc --workspace --all-features -- -Z unstable-options --format=junit --report-time > doc.xml
+    - cargo clippy --workspace --all-targets "$FEATURES" -- -D warnings
+    - cargo test --lib --workspace "$FEATURES" -- -Z unstable-options --format=junit --report-time > lib.xml
+    - cargo test --doc --workspace "$FEATURES" -- -Z unstable-options --format=junit --report-time > doc.xml
   cache:
     - key: "crates.io"
       paths:
@@ -56,3 +56,8 @@ test:
         USE_MINIMAL_VERSIONS:
         - "false"
         - "true"
+        FEATURES:
+        - "--no-default-features"
+        - "--no-default-features --features num-bigint"
+        - "--no-default-features --features rug"
+        - "--all-features"
