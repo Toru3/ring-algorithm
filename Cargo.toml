@@ -26,7 +26,7 @@ num = "0.4.0"
 polynomial-ring = "0.4.1"
 rand = "0.8.4"
 [features]
-default = ["num-bigint", "rug"]
+default = []
 __internal_inject_debug = [] # DO NOT USE
 [package.metadata.docs.rs]
 rustdoc-args = [

@@ -4,6 +4,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Changed MSRV 1.65.0
+- Removed `num-bigint`, `rug` from default features
 ## [0.6.1] - 2022-11-27
 ### Added
 - Add minimum supported Rust version
