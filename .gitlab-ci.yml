@@ -33,7 +33,7 @@ test:
         - cargo/registry/index/
         - cargo/registry/cache/
         - cargo/git/db/
-    - key: "target"
+    - key: "target-${RUST_VERSION}"
       paths:
         - target_cache/
   artifacts:
