@@ -2,6 +2,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
+## [0.7.0] - 2023-03-13
 ### Changed
 - Changed MSRV 1.65.0
 - Removed `num-bigint`, `rug` from default features
