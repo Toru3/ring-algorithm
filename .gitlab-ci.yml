@@ -1,11 +1,8 @@
-image: "rust:latest"
+image: "toru3/rust:latest"
 
 test:
   stage: test
   script:
-    # ツールのインストール
-    - rustup toolchain install "$RUST_VERSION" --component rustfmt clippy
-    - rustup install nightly
     - rustup default "$RUST_VERSION"
     # キャッシュの設定
     - if [ "${DISABLE_CACHE:-false}" = "false" ]; then
@@ -30,7 +27,7 @@ test:
     - cargo test --lib --workspace $FEATURES -- -Z unstable-options --format=junit --report-time > lib.xml
     - cargo test --doc --workspace $FEATURES -- -Z unstable-options --format=junit --report-time > doc.xml
   cache:
-    - key: "crates.io"
+    - key: "crates.io-${USE_MINIMAL_VERSIONS}"
       paths:
         - cargo/bin/
         - cargo/registry/index/
@@ -50,7 +47,6 @@ test:
         - doc.xml
   variables:
     CARGO_UNSTABLE_SPARSE_REGISTRY: "true"
-    CARGO_LOG: "cargo::sources::registry::http_remote=debug"
   parallel:
     matrix:
       - RUST_VERSION:
