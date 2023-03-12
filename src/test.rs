@@ -5,7 +5,12 @@ use polynomial_ring::Polynomial;
 
 impl<K> RingNormalize for Polynomial<K>
 where
-    K: Clone + Zero + One + for<'x> std::ops::AddAssign<&'x K> + for<'x> std::ops::DivAssign<&'x K>,
+    K: Clone
+        + Zero
+        + One
+        + for<'x> std::ops::AddAssign<&'x K>
+        + for<'x> std::ops::MulAssign<&'x K>
+        + for<'x> std::ops::DivAssign<&'x K>,
     for<'x> &'x K: std::ops::Mul<Output = K>,
 {
     fn leading_unit(&self) -> Self {
