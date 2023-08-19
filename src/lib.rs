@@ -240,6 +240,7 @@ where
 
 /** Chinese remainder theorem
 
+Using an unsigned type as `T` will cause overflow.
 ```
 use ring_algorithm::chinese_remainder_theorem;
 let u = vec![2, 3, 2];
