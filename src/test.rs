@@ -226,6 +226,9 @@ fn test_crt() {
     let u = vec![2, 3, 2];
     let m = vec![3, 5, 7];
     check_crt::<i32>(&u, &m);
+    let u = vec![2, 3, 7];
+    let m = vec![16, 5, 9];
+    check_crt::<i32>(&u, &m);
     let u = vec![
         3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3, 2, 3, 8, 4, 6, 2, 6, 4, 3, 3,
     ];
