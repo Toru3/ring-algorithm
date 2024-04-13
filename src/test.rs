@@ -1,6 +1,4 @@
-use crate::sealed;
 use crate::*;
-use num_traits::{One, Zero};
 use polynomial_ring::Polynomial;
 
 impl<K> RingNormalize for Polynomial<K>
