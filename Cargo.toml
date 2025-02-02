@@ -16,9 +16,9 @@ rust-version = "1.74.1"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-num-traits = "0.2.15"
-num-bigint = { version = "0.4.3", optional = true }
-rug = { version = "1.19.1", features = ["num-traits"], optional = true }
+num-traits = "0.2.19"
+num-bigint = { version = "0.4.6", optional = true }
+rug = { version = "1.27.0", features = ["num-traits"], optional = true }
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }
 is-prime-for-primitive-int = "0.5.1"
