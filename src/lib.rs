@@ -1,13 +1,15 @@
 #![cfg_attr(feature = "__internal_inject_debug", recursion_limit = "16")]
 use num_traits::{One, Zero};
 use std::ops::{Add, AddAssign, BitAnd, Mul, MulAssign, Rem, ShrAssign};
+#[cfg(feature = "__internal_inject_debug")]
 mod sealed {
     pub trait SizedExt: std::marker::Sized + std::fmt::Debug + std::fmt::Display {}
     impl<T> SizedExt for T where T: std::marker::Sized + std::fmt::Debug + std::fmt::Display {}
-    #[cfg(not(feature = "__internal_inject_debug"))]
-    pub use std::marker::Sized;
-    #[cfg(feature = "__internal_inject_debug")]
     pub use SizedExt as Sized;
+}
+#[cfg(not(feature = "__internal_inject_debug"))]
+mod sealed {
+    pub use std::marker::Sized;
 }
 mod ring_traits;
 #[cfg(test)]
