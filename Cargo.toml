@@ -1,6 +1,6 @@
 [package]
 name = "ring-algorithm"
-version = "0.7.0"
+version = "0.8.0"
 authors = ["Toru3 <ryuutet@gmail.com>"]
 edition = "2021"
 description = "algorithms on ring (Abstruct Algebra)"
