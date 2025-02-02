@@ -50,7 +50,7 @@ test:
       - RUST_VERSION:
         - "stable"
         - "beta"
-        - "1.66.1" # MSRV
+        - "1.74.1" # MSRV
         USE_MINIMAL_VERSIONS:
         - "false"
         - "true"
