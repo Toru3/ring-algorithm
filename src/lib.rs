@@ -94,7 +94,7 @@ where
     mul_power(T::one(), a, p)
 }
 
-/** calcurate $`b*a^p`$ with exponentiation by squaring
+/** calcurate $`b \cdot a^p`$ with exponentiation by squaring
 
 This function doesn't require `T: num_traits::One`.
 ```
