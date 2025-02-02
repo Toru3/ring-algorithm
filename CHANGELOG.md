@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed MSRV 1.66.1
 ### Added
-- `mul_power`
+- `add_times`, `mul_power`
 ## [0.7.0] - 2023-03-13
 ### Changed
 - Changed MSRV 1.65.0

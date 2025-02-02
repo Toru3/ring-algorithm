@@ -23,7 +23,7 @@ use ring_algorithm::times;
 assert_eq!(times::<i32, u64>(2, 16), 32);
 ```
 */
-pub fn times<T, U>(a: T, mut p: U) -> T
+pub fn times<T, U>(a: T, p: U) -> T
 where
     T: sealed::Sized + Zero + for<'x> AddAssign<&'x T> + for<'x> From<<&'x T as Add>::Output>,
     for<'x> &'x T: Add,
@@ -35,7 +35,30 @@ where
         + for<'x> From<<&'x U as BitAnd>::Output>,
     for<'x> &'x U: BitAnd,
 {
-    let mut x = T::zero();
+    add_times(T::zero(), a, p)
+}
+
+/** calcurate $`b + pa`$ with mutliprecation by doubling
+
+This function doesn't require `T: num_traits::Zero`.
+```
+use ring_algorithm::add_times;
+assert_eq!(add_times::<i32, u64>(3, 2, 7), 17);
+```
+*/
+pub fn add_times<T, U>(b: T, a: T, mut p: U) -> T
+where
+    T: sealed::Sized + for<'x> AddAssign<&'x T> + for<'x> From<<&'x T as Add>::Output>,
+    for<'x> &'x T: Add,
+    U: sealed::Sized
+        + Zero
+        + One
+        + Eq
+        + for<'x> ShrAssign<usize>
+        + for<'x> From<<&'x U as BitAnd>::Output>,
+    for<'x> &'x U: BitAnd,
+{
+    let mut x = b;
     let mut y = a;
     loop {
         if U::from(&p & &U::one()) == U::one() {
