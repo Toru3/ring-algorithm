@@ -20,11 +20,11 @@ num-traits = "0.2.15"
 num-bigint = { version = "0.4.3", optional = true }
 rug = { version = "1.19.1", features = ["num-traits"], optional = true }
 [dev-dependencies]
-criterion = { version = "0.3.6", features = ["html_reports"] }
+criterion = { version = "0.5.1", features = ["html_reports"] }
 is-prime-for-primitive-int = "0.5.1"
 num = "0.4.0"
 polynomial-ring = "0.5.0"
-rand = "0.8.5"
+rand = "0.9.0"
 [features]
 default = []
 __internal_inject_debug = [] # DO NOT USE
