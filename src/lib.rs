@@ -56,7 +56,7 @@ use ring_algorithm::power;
 assert_eq!(power::<i32, u64>(2, 16), 65536);
 ```
 */
-pub fn power<T, U>(a: T, mut p: U) -> T
+pub fn power<T, U>(a: T, p: U) -> T
 where
     T: sealed::Sized + One + for<'x> MulAssign<&'x T> + for<'x> From<<&'x T as Mul>::Output>,
     for<'x> &'x T: Mul,
@@ -68,7 +68,30 @@ where
         + for<'x> From<<&'x U as BitAnd>::Output>,
     for<'x> &'x U: BitAnd,
 {
-    let mut x = T::one();
+    mul_power(T::one(), a, p)
+}
+
+/** calcurate $`b*a^p`$ with exponentiation by squaring
+
+This function doesn't require `T: num_traits::One`.
+```
+use ring_algorithm::mul_power;
+assert_eq!(mul_power::<i32, u64>(3, 2, 7), 384);
+```
+*/
+pub fn mul_power<T, U>(b: T, a: T, mut p: U) -> T
+where
+    T: sealed::Sized + for<'x> MulAssign<&'x T> + for<'x> From<<&'x T as Mul>::Output>,
+    for<'x> &'x T: Mul,
+    U: sealed::Sized
+        + Zero
+        + One
+        + Eq
+        + for<'x> ShrAssign<usize>
+        + for<'x> From<<&'x U as BitAnd>::Output>,
+    for<'x> &'x U: BitAnd,
+{
+    let mut x = b;
     let mut y = a;
     loop {
         if U::from(&p & &U::one()) == U::one() {
