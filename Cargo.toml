@@ -25,8 +25,9 @@ is-prime-for-primitive-int = "0.5.1"
 num = "0.4.3"
 polynomial-ring = "0.5.0"
 rand = "0.9.0"
-[patch.crates-io]
-gmp-mpfr-sys = { git = 'https://gitlab.com/benruijl/gmp-mpfr-sys.git', rev = 'fe062a3066618bbb2a92ea3f79adc741d9ec1f3f' }
+[patch.crates-io.gmp-mpfr-sys]
+git = 'https://gitlab.com/benruijl/gmp-mpfr-sys.git'
+rev = 'fe062a3066618bbb2a92ea3f79adc741d9ec1f3f'
 [features]
 default = []
 __internal_inject_debug = [] # DO NOT USE
