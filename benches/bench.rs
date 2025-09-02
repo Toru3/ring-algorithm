@@ -1,9 +1,9 @@
 use criterion::{
-    black_box, criterion_group, criterion_main, AxisScale, BenchmarkId, Criterion,
-    PlotConfiguration,
+    criterion_group, criterion_main, AxisScale, BenchmarkId, Criterion, PlotConfiguration,
 };
 use is_prime_for_primitive_int::IsPrime;
 use ring_algorithm::*;
+use std::hint::black_box;
 type Z = rug::Integer;
 
 fn make_input(len: usize) -> (Vec<Z>, Vec<Z>) {
